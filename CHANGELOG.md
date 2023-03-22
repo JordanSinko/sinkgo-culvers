@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.0 (2023-03-22)
+
+
+### Features
+
+* initial push ([f4529fe](https://github.com/JordanSinko/sinkgo-culvers/commit/f4529fefbf8c9a78b1d6ba900956bff80996aec4))
+
 ## [1.1.0](https://github.com/JordanSinko/sinkgo-mario/compare/v1.0.6...v1.1.0) (2023-03-17)
 
 
