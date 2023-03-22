@@ -1,4 +1,4 @@
-module github.com/jordansinko/sinkgo-mario
+module github.com/jordansinko/sinkgo-culvers
 
 go 1.19
 

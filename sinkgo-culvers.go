@@ -28,8 +28,8 @@ import (
 	http2 "github.com/saucesteals/fhttp/http2"
 
 	imap2 "github.com/emersion/go-imap"
-	"github.com/jordansinko/sinkgo-mario/pkg/akamai"
-	"github.com/jordansinko/sinkgo-mario/pkg/captcha"
+	"github.com/jordansinko/sinkgo-culvers/pkg/akamai"
+	"github.com/jordansinko/sinkgo-culvers/pkg/captcha"
 )
 
 var (
