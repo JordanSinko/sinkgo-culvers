@@ -1,0 +1,40 @@
+on:
+  release:
+    types:
+      - released
+
+name: update-latest-tag
+jobs:
+  update-tag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.ACTIONS_TOKEN }}
+          script: |
+            const [ major ] = context.payload.release.tag_name.split(".");
+            const { repository } = context.payload;
+
+            console.log(JSON.stringify({context}));
+
+            const tag = `${major}`;
+            console.log(`updating tag '${tag}'`);
+
+            try {
+              console.log("trying to update");
+              await github.rest.git.updateRef({
+                owner: repository.owner.login,
+                repo: repository.name,
+                ref: `tags/${tag}`,
+                sha: context.sha,
+              });
+            } catch(err) {
+              console.log(err);
+              console.log("trying to create");
+              await github.rest.git.createRef({
+                owner: repository.owner.login,
+                repo: repository.name,
+                ref: `refs/tags/${tag}`,
+                sha: context.sha,
+              });
+            }

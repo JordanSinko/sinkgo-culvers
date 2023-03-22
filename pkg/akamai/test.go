@@ -1,0 +1,5 @@
+package akamai
+
+func main() {
+
+}

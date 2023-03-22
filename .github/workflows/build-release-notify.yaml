@@ -1,0 +1,80 @@
+on:
+  release:
+    types:
+      - released
+
+name: build-publish-notify
+jobs:
+  build-publish-notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version: 1.19.x
+      - id: version_number
+        uses: actions/github-script@v6.4.0
+        with:
+          script: core.setOutput('moduleVersionNumber', context?.payload?.release?.name?.slice(1) ?? "0.0.0");
+      - run: |
+          echo "building module with version ${{steps.version_number.outputs.moduleVersionNumber}}"
+          GOOS=windows GOARCH=amd64 go build -ldflags "-X main.version=${{steps.version_number.outputs.moduleVersionNumber}}"
+      - uses: actions/github-script@v6.4.0
+        with:
+          github-token: ${{ secrets.ACTIONS_TOKEN }}
+          script: |
+            const fs = require("fs");
+
+            const { release, repository } = context.payload;
+            const { body, name } = release;
+            const [, moduleName] = /sinkgo-(.+)/.exec(repository.name) ?? []
+
+            const data = fs.readFileSync(`./${repository.name}.exe`);
+
+            let publicReleaseBody = body;
+
+            const matches = publicReleaseBody.match(/\(?\[.*?\)\)?/g) ?? [];
+
+            for (const match of matches) {
+              if (match.startsWith("(")) {
+                publicReleaseBody = publicReleaseBody.replace(match, "");
+                continue;
+              }
+
+              const [, txt] = match.match(/\[(.*?)\]/);
+              publicReleaseBody = publicReleaseBody.replace(match, txt);
+            }
+
+            const { data: publicRelease } = await github.rest.repos.createRelease({
+              owner: repository.owner.login,
+              repo: `sinkgo-releases`,
+              tag_name: `${moduleName}-${name}`,
+              name: `${moduleName} - ${name}`,
+              body: publicReleaseBody,
+            });
+
+            const { data: publicAsset } = await github.rest.repos.uploadReleaseAsset({
+              owner: context.repo.owner,
+              repo: `sinkgo-releases`,
+              release_id: publicRelease.id,
+              name: `${moduleName}-${name}.exe`,
+              data,
+            });
+
+            await fetch("https://discord.com/api/webhooks/1075111946505957386/7AM9VyiRdyxZDyYczAD8e9V5kFPLc-9nKG_6kg4u_zYFje_YJRDjEHAWQ80aE_V3hvvU", {
+              method: "POST",
+              headers: {
+               "accept": "*/*",
+                "content-type": "application/json",
+              },
+              body: JSON.stringify({
+                embeds: [
+                  {
+                    title: publicRelease.name,
+                    description: publicReleaseBody,
+                    color: 5814783,
+                    url: publicAsset.browser_download_url
+                  },
+                ]
+              })
+            })

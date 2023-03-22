@@ -1,0 +1,16 @@
+on:
+  push:
+    branches:
+      - master
+name: release-please
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          GITHUB_TOKEN: ${{ secrets.ACTIONS_TOKEN }}
+        uses: google-github-actions/release-please-action@v3
+        with:
+          token: ${{ secrets.ACTIONS_TOKEN }}
+          release-type: node
+          package-name: release-please-action
