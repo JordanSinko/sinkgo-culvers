@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/JordanSinko/sinkgo-culvers/compare/v1.0.0...v1.0.1) (2023-03-22)
+
+
+### Bug Fixes
+
+* import name ([0da0d76](https://github.com/JordanSinko/sinkgo-culvers/commit/0da0d761f1350a7e741360189475ed134f9ab203))
+
 ## 1.0.0 (2023-03-22)
 
 
